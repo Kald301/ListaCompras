@@ -12,11 +12,11 @@ function consulta() {
         label.innerText = presupuesto; // Cambia el contenido del label
     }
     console.log()
-    
+
     document.getElementById('valor_restante').innerHTML = presupuesto
 }
 
-function calcular(){
+function calcular() {
 
     const restante = parseFloat(document.getElementById('valor_restante').innerHTML)
     const valor = parseFloat(document.getElementById('cantidad').value)
@@ -24,7 +24,7 @@ function calcular(){
 
     let nuevo_presupuesto = restante - valor
 
-    if (nuevo_presupuesto < 0){
+    if (nuevo_presupuesto < 0) {
         nuevo_presupuesto = restante + valor - valor
         alert("NO TE QUEDA DINERO")
     }
@@ -34,28 +34,61 @@ function calcular(){
 
 const mi_inventario = {};
 
-function inventario(){
+function inventario() {
 
     objeto = document.getElementById('gasto').value
-    valor_obj = document.getElementById('cantidad').value
-    
+    valor_obj = parseFloat(document.getElementById('cantidad').value)
 
-    if (objeto){
-        mi_inventario[objeto]=valor_obj
+    if (objeto && !isNaN(valor_obj)) {
+
+        if (mi_inventario[objeto]) {
+            mi_inventario[objeto] += valor_obj;
+        }
+        else{
+            mi_inventario[objeto] = valor_obj;
+        }
     }
     console.log(mi_inventario)
 
 }
 
+function ver_lista(){
+    const lista_compras = document.getElementById("lista_de_compras")
+    lista_compras.innerHTML = "";
+
+    for (const [objeto, valor_obj] of Object.entries(mi_inventario)) {
+        const li = document.createElement("li");
+        li.textContent = `${objeto} = ${valor_obj}`;
+
+        const eliminar_compra = document.createElement("button");
+        eliminar_compra.textContent = "Remover";
+        eliminar_compra.addEventListener("click", () => {eliminar_compra_func(objeto);
+        });
+
+        li.appendChild(eliminar_compra);
+        lista_compras.appendChild(li);
+    }
+}
+
+function eliminar_compra_func(objeto){
+    extracto = mi_inventario[objeto]
+    console.log(extracto)
+    const restante = parseFloat(document.getElementById('valor_restante').innerHTML)
+    const nuevo_presupuesto =  restante + extracto
+
+    document.getElementById('valor_restante').innerHTML = nuevo_presupuesto
+
+    delete mi_inventario[objeto]
+    ver_lista()
+}
 
 document
-	.getElementById('agregar-gasto')
-	.addEventListener('submit', function (event) {
-		event.preventDefault();
-        
+    .getElementById('agregar-gasto')
+    .addEventListener('submit', function (event) {
+        event.preventDefault();
+
         calcular()
         inventario();
-        
+        ver_lista()
 
-		event.target.submit();
-	});
+    });
